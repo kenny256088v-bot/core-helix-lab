@@ -71,3 +71,4 @@ if prompt := st.chat_input("Partner, explain the derivation for..."):
             # We trap the error without exposing the key in logs
             st.error(f"⚠️ Brain Sync Jitter: {e}")
             st.info("Check if the 'Generative Language API' is enabled in your Google Cloud Library.")
+            
