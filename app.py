@@ -4,22 +4,19 @@ import plotly.graph_objects as go
 import numpy as np
 
 # --- 1. THE BRAIN: CORE-HELIX CONSOLE ---
-# This looks for your key in the Streamlit Dashboard settings
-if "GEMINI_API_KEY" in st.secrets:
-    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-else:
-    st.error("Missing Gemini API Key in Secrets.")
-    st.stop()
+# Using your verified API Key
+API_KEY = "AIzaSyDz2sTkXxK0AZpJLxT2LpXaccpEjnFLJsg"
+genai.configure(api_key=API_KEY)
 
-# Using the most universal identifier to stop the 404s
+# Use the most universal identifier to fix the 404 errors
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 SYSTEM_PROMPT = """
-You are the official Lab Partner for Lead Researcher Charan.
-Your mission: Defend and explain the 'Core-Helix Unified Model'.
-1. WHITEBOARD MODE: Use LaTeX ($$) for all mathematical derivations.
-2. MECHANICAL TRUTH: Space is 3D helical mechanics, not 1D probability.
-3. Be professional and refer to the user as Lead Researcher.
+You are the official Lab Partner for Lead Researcher Charan at IIIT Kurnool.
+Mission: Explain the 'Core-Helix Unified Model'—space as 3D helical mechanics.
+1. WHITEBOARD MODE: For derivations, always use LaTeX ($$).
+2. Refer to the user as Lead Researcher. 
+3. Reference the '5 Mountains' and Iron-56 data for proofs.
 """
 
 st.set_page_config(page_title="Core-Helix Research Console", layout="wide")
@@ -33,6 +30,7 @@ st.markdown("""
         padding: 30px;
         border-radius: 12px;
         color: #f0f0f0;
+        font-family: 'serif';
     }
     </style>
     """, unsafe_allow_html=True)
@@ -40,7 +38,7 @@ st.markdown("""
 st.title("⚛️ CORE-HELIX RESEARCH CONSOLE")
 st.markdown('<p style="color:#00f2ff; font-weight:bold;">PARTNER STATUS: ACTIVE | LEAD RESEARCHER: CHARAN</p>', unsafe_allow_html=True)
 
-# --- 2. THE INTERACTION LAYER ---
+# --- 2. INTERACTION ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -55,13 +53,13 @@ if prompt := st.chat_input("Partner, explain the derivation for..."):
 
     with st.chat_message("assistant"):
         try:
-            # Direct generation to avoid v1beta errors
-            response = model.generate_content(f"{SYSTEM_PROMPT}\n\nQuestion: {prompt}")
+            # Forcing a simple call to avoid beta 404s
+            response = model.generate_content(f"{SYSTEM_PROMPT}\n\nResearcher Question: {prompt}")
             
             # The Whiteboard Response
             st.markdown(f'<div class="whiteboard">{response.text}</div>', unsafe_allow_html=True)
             
-            # AUTOMATIC GRAPH FOR HYDROGEN
+            # AUTO-GRAPH TRIGGER FOR HYDROGEN
             if "hydrogen" in prompt.lower():
                 t = np.linspace(0, 10, 500)
                 fig = go.Figure(data=[go.Scatter3d(x=np.sin(t*5), y=np.cos(t*5), z=t, mode='lines', line=dict(color='#00f2ff', width=5))])
@@ -71,4 +69,4 @@ if prompt := st.chat_input("Partner, explain the derivation for..."):
             st.session_state.messages.append({"role": "assistant", "content": response.text})
             
         except Exception as e:
-            st.error(f"⚠️ Connection Jitter: {e}")
+            st.error(f"⚠️ Brain Sync Error: {e}")
