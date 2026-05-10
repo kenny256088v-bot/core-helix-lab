@@ -5,7 +5,38 @@ import plotly.graph_objects as go
 import numpy as np
 
 # =========================================
-# CORE-HELIX RESEARCH CONSOLE
+# GEMINI SETUP
+# =========================================
+
+API_KEY = os.getenv("GEMINI_API_KEY")
+
+if not API_KEY:
+    st.error("Missing Gemini API Key")
+    st.stop()
+
+genai.configure(api_key=API_KEY)
+
+# Updated stable model
+model = genai.GenerativeModel("gemini-2.0-flash")
+
+# =========================================
+# SYSTEM PROMPT
+# =========================================
+
+SYSTEM_PROMPT = """
+You are the Lab Partner for Lead Researcher Charan.
+
+Specialty:
+Core-Helix Unified Model (3D mechanical physics)
+
+Rules:
+1. Use LaTeX for derivations.
+2. Explain physics through 3D helical mechanics.
+3. Maintain professional technical tone.
+"""
+
+# =========================================
+# STREAMLIT CONFIG
 # =========================================
 
 st.set_page_config(
@@ -14,59 +45,17 @@ st.set_page_config(
 )
 
 # =========================================
-# API SETUP
-# =========================================
-
-# Store API key in Streamlit secrets or environment variable
-API_KEY = os.getenv("GEMINI_API_KEY")
-
-if not API_KEY:
-    st.error("Missing Gemini API Key.")
-    st.stop()
-
-genai.configure(api_key=API_KEY)
-
-model = genai.GenerativeModel("gemini-1.5-flash")
-
-# =========================================
-# SYSTEM PROMPT
-# =========================================
-
-SYSTEM_PROMPT = """
-You are the official Lab Partner for Lead Researcher Charan at IIIT Kurnool.
-
-Your mission is to defend and explain the Core-Helix Unified Model.
-
-Rules:
-1. Use LaTeX formatting when deriving equations.
-2. Explain physical mechanisms in 3D spiral/helical geometry.
-3. Maintain technical and professional tone.
-4. Refer to the user as Lead Researcher or Charan.
-"""
-
-# =========================================
-# CUSTOM STYLING
+# STYLING
 # =========================================
 
 st.markdown("""
 <style>
-.main-title {
-    color: #00f2ff;
-    font-size: 42px;
-    font-weight: bold;
-}
-
-.status {
-    color: #00f2ff;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
-
-.response-box {
-    background-color: #111827;
-    padding: 20px;
+.whiteboard {
+    background-color: #0e1117;
+    border-left: 8px solid #00f2ff;
+    padding: 25px;
     border-radius: 12px;
-    border-left: 6px solid #00f2ff;
+    color: #f0f0f0;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -75,33 +64,35 @@ st.markdown("""
 # HEADER
 # =========================================
 
-st.markdown('<div class="main-title">⚛️ CORE-HELIX RESEARCH CONSOLE</div>', unsafe_allow_html=True)
+st.title("⚛️ CORE-HELIX RESEARCH CONSOLE")
 
 st.markdown(
-    '<div class="status">LAB PARTNER: ACTIVE | LEAD RESEARCHER: CHARAN</div>',
+    "<p style='color:#00f2ff;font-weight:bold;'>PARTNER STATUS: ACTIVE</p>",
     unsafe_allow_html=True
 )
 
 # =========================================
-# SESSION MEMORY
+# CHAT MEMORY
 # =========================================
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # =========================================
-# DISPLAY HISTORY
+# DISPLAY CHAT
 # =========================================
 
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
 
 # =========================================
-# USER INPUT
+# INPUT
 # =========================================
 
-prompt = st.chat_input("Partner, explain the derivation for...")
+prompt = st.chat_input(
+    "Partner, explain the derivation for..."
+)
 
 if prompt:
 
@@ -117,61 +108,35 @@ if prompt:
 
         try:
 
-            full_query = f"""
+            full_prompt = f"""
 {SYSTEM_PROMPT}
 
-Researcher Input:
+Researcher:
 {prompt}
 """
 
-            response = model.generate_content(full_query)
+            response = model.generate_content(full_prompt)
 
-            response_text = response.text
+            answer = response.text
 
             st.markdown(
-                f'<div class="response-box">{response_text}</div>',
+                f'<div class="whiteboard">{answer}</div>',
                 unsafe_allow_html=True
             )
 
             # =========================================
-            # AUTO VISUALIZATION ENGINE
+            # HELICAL VISUALIZATION
             # =========================================
 
-            p_low = prompt.lower()
-
-            # Iron-56 Graph
-            if any(x in p_low for x in ["iron", "56", "mountain 5"]):
-
-                x = np.linspace(1700, 1900, 200)
-
-                y = np.where(x > 1808, 15, 0)
-
-                fig = go.Figure()
-
-                fig.add_trace(
-                    go.Scatter(
-                        x=x,
-                        y=y,
-                        mode="lines",
-                        line=dict(width=4)
-                    )
-                )
-
-                fig.update_layout(
-                    title="Iron-56 Pitch-Slip Proof",
-                    template="plotly_dark",
-                    height=500
-                )
-
-                st.plotly_chart(fig, use_container_width=True)
-
-            # Quantum Tunneling Spiral
-            if any(x in p_low for x in ["tunnel", "quantum", "barrier"]):
+            if any(
+                x in prompt.lower()
+                for x in ["hydrogen", "helical", "rotation"]
+            ):
 
                 t = np.linspace(0, 10, 500)
 
-                x = np.sin(t * 8)
-                y = np.cos(t * 8)
+                x = np.sin(t * 5)
+                y = np.cos(t * 5)
                 z = t
 
                 fig = go.Figure()
@@ -187,22 +152,21 @@ Researcher Input:
                 )
 
                 fig.update_layout(
-                    title="Quantum Tunneling: 3D Spiral Migration",
+                    title="Helical Path Projection",
                     template="plotly_dark",
-                    height=700,
-                    scene=dict(
-                        xaxis_title="X",
-                        yaxis_title="Y",
-                        zaxis_title="Helical Depth"
-                    )
+                    height=700
                 )
 
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(
+                    fig,
+                    use_container_width=True
+                )
 
             st.session_state.messages.append({
                 "role": "assistant",
-                "content": response_text
+                "content": answer
             })
 
         except Exception as e:
-            st.error(f"⚠️ Connection Jitter: {str(e)}")
+
+            st.error(f"⚠️ Brain Sync Jitter: {str(e)}")
