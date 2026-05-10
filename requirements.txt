@@ -1,4 +1,6 @@
 streamlit
-numpy
-plotly
 google-generativeai
+plotly
+numpy
+sympy
+scipy
