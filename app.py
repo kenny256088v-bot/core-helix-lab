@@ -5,7 +5,7 @@ import numpy as np
 
 # --- 1. THE BRAIN: CORE-HELIX CONSOLE ---
 # Use the new key you generated today (...0Cv0)
-NEW_API_KEY = "PASTE_YOUR_NEW_KEY_HERE" 
+NEW_API_KEY = "AIzaSyDpWgXCVwIqaESO2xVaT6zlZSxCmhp" 
 genai.configure(api_key=NEW_API_KEY)
 
 # Calling the stable model directly to avoid v1beta 404 errors
