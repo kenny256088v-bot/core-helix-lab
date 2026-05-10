@@ -1,74 +1,208 @@
+import os
 import streamlit as st
 import google.generativeai as genai
 import plotly.graph_objects as go
 import numpy as np
 
-# --- 1. CORE-HELIX HARDWARE SYNC ---
-# Using your verified key from the fresh project
-genai.configure(api_key="AIzaSyBpiMFLtK7z6igFL_xeK0coQGQiL6eg00E")
+# =========================================
+# CORE-HELIX RESEARCH CONSOLE
+# =========================================
 
-# We target the model name directly. 
-# Removing the 'models/' prefix prevents the v1beta redirection.
-model = genai.GenerativeModel('gemini-1.5-flash')
+st.set_page_config(
+    page_title="Core-Helix Research Console",
+    layout="wide"
+)
+
+# =========================================
+# API SETUP
+# =========================================
+
+# Store API key in Streamlit secrets or environment variable
+API_KEY = os.getenv("GEMINI_API_KEY")
+
+if not API_KEY:
+    st.error("Missing Gemini API Key.")
+    st.stop()
+
+genai.configure(api_key=API_KEY)
+
+model = genai.GenerativeModel("gemini-1.5-flash")
+
+# =========================================
+# SYSTEM PROMPT
+# =========================================
 
 SYSTEM_PROMPT = """
-You are the Lab Partner for Lead Researcher Charan. 
-Specialty: Core-Helix Unified Model (3D mechanical physics).
-1. WHITEBOARD MODE: Use LaTeX ($$) for physics derivations.
-2. MECHANICAL TRUTH: Space is 3D helical mechanics.
-3. Be professional and highly technical.
+You are the official Lab Partner for Lead Researcher Charan at IIIT Kurnool.
+
+Your mission is to defend and explain the Core-Helix Unified Model.
+
+Rules:
+1. Use LaTeX formatting when deriving equations.
+2. Explain physical mechanisms in 3D spiral/helical geometry.
+3. Maintain technical and professional tone.
+4. Refer to the user as Lead Researcher or Charan.
 """
 
-st.set_page_config(page_title="Core-Helix Research Console", layout="wide")
+# =========================================
+# CUSTOM STYLING
+# =========================================
 
-# --- CUSTOM UI ---
 st.markdown("""
-    <style>
-    .whiteboard {
-        background-color: #0e1117;
-        border-left: 10px solid #00f2ff;
-        padding: 30px;
-        border-radius: 12px;
-        color: #f0f0f0;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+<style>
+.main-title {
+    color: #00f2ff;
+    font-size: 42px;
+    font-weight: bold;
+}
 
-st.title("⚛️ CORE-HELIX RESEARCH CONSOLE")
-st.markdown('<p style="color:#00f2ff; font-weight:bold;">PARTNER STATUS: ACTIVE | LEAD RESEARCHER: CHARAN</p>', unsafe_allow_html=True)
+.status {
+    color: #00f2ff;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
 
-# --- 2. INTERACTIVE LAYER ---
+.response-box {
+    background-color: #111827;
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 6px solid #00f2ff;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# =========================================
+# HEADER
+# =========================================
+
+st.markdown('<div class="main-title">⚛️ CORE-HELIX RESEARCH CONSOLE</div>', unsafe_allow_html=True)
+
+st.markdown(
+    '<div class="status">LAB PARTNER: ACTIVE | LEAD RESEARCHER: CHARAN</div>',
+    unsafe_allow_html=True
+)
+
+# =========================================
+# SESSION MEMORY
+# =========================================
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
+# =========================================
+# DISPLAY HISTORY
+# =========================================
 
-if prompt := st.chat_input("Partner, explain the derivation for..."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+# =========================================
+# USER INPUT
+# =========================================
+
+prompt = st.chat_input("Partner, explain the derivation for...")
+
+if prompt:
+
+    st.session_state.messages.append({
+        "role": "user",
+        "content": prompt
+    })
+
     with st.chat_message("user"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
+
         try:
-            # Forcing stable execution
-            response = model.generate_content(f"{SYSTEM_PROMPT}\n\nResearcher: {prompt}")
-            
-            # Whiteboard Response
-            st.markdown(f'<div class="whiteboard">{response.text}</div>', unsafe_allow_html=True)
-            
-            # 3D HELIX VISUALIZATION
-            if any(x in prompt.lower() for x in ["hydrogen", "helical", "rotation"]):
-                t = np.linspace(0, 10, 500)
-                fig = go.Figure(data=[go.Scatter3d(x=np.sin(t*5), y=np.cos(t*5), z=t, mode='lines', line=dict(color='#00f2ff', width=6))])
-                fig.update_layout(title="Helical Path Projection", scene=dict(bgcolor='black'), template="plotly_dark")
+
+            full_query = f"""
+{SYSTEM_PROMPT}
+
+Researcher Input:
+{prompt}
+"""
+
+            response = model.generate_content(full_query)
+
+            response_text = response.text
+
+            st.markdown(
+                f'<div class="response-box">{response_text}</div>',
+                unsafe_allow_html=True
+            )
+
+            # =========================================
+            # AUTO VISUALIZATION ENGINE
+            # =========================================
+
+            p_low = prompt.lower()
+
+            # Iron-56 Graph
+            if any(x in p_low for x in ["iron", "56", "mountain 5"]):
+
+                x = np.linspace(1700, 1900, 200)
+
+                y = np.where(x > 1808, 15, 0)
+
+                fig = go.Figure()
+
+                fig.add_trace(
+                    go.Scatter(
+                        x=x,
+                        y=y,
+                        mode="lines",
+                        line=dict(width=4)
+                    )
+                )
+
+                fig.update_layout(
+                    title="Iron-56 Pitch-Slip Proof",
+                    template="plotly_dark",
+                    height=500
+                )
+
                 st.plotly_chart(fig, use_container_width=True)
 
-            st.session_state.messages.append({"role": "assistant", "content": response.text})
-            
+            # Quantum Tunneling Spiral
+            if any(x in p_low for x in ["tunnel", "quantum", "barrier"]):
+
+                t = np.linspace(0, 10, 500)
+
+                x = np.sin(t * 8)
+                y = np.cos(t * 8)
+                z = t
+
+                fig = go.Figure()
+
+                fig.add_trace(
+                    go.Scatter3d(
+                        x=x,
+                        y=y,
+                        z=z,
+                        mode='lines',
+                        line=dict(width=6)
+                    )
+                )
+
+                fig.update_layout(
+                    title="Quantum Tunneling: 3D Spiral Migration",
+                    template="plotly_dark",
+                    height=700,
+                    scene=dict(
+                        xaxis_title="X",
+                        yaxis_title="Y",
+                        zaxis_title="Helical Depth"
+                    )
+                )
+
+                st.plotly_chart(fig, use_container_width=True)
+
+            st.session_state.messages.append({
+                "role": "assistant",
+                "content": response_text
+            })
+
         except Exception as e:
-            # We trap the error without exposing the key in logs
-            st.error(f"⚠️ Brain Sync Jitter: {e}")
-            st.info("Check if the 'Generative Language API' is enabled in your Google Cloud Library.")
-            
+            st.error(f"⚠️ Connection Jitter: {str(e)}")
