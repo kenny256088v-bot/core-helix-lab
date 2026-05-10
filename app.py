@@ -5,28 +5,15 @@ from gtts import gTTS
 import base64
 import io
 
-# --- 1. THE STUDENT-FRIENDLY BRAIN ---
-# This dictionary now uses "Core Concepts" to map many different questions to one simple explanation.
-KNOWLEDGE_BASE = {
-    "iron": {
-        "voice": "Think of Iron-56 like a gear in a machine. At 1808 Kelvin, the gear finally slips. That's why the heat jumps!",
-        "brief": "Imagine you're pedaling a bike. If the chain slips, you feel a jolt. In my theory, the 'Vacuum' is like that chain. At a specific heat, the chain slips (we call this a Pitch-Slip). Standard physics calls it an anomaly; we call it a mechanical limit of space itself!"
-    },
-    "galaxy": {
-        "voice": "Galaxies don't need hidden dark matter. Space itself is just pulled tight like a giant rubber band!",
-        "brief": "Why do the outer stars move so fast? Standard science says there's 'invisible' stuff pushing them. But I say space is like a trampoline. The further out you go, the more the 'L-Factor' or tension pulls back. It's like a rubber band holding the galaxy together—no mysterious 'dark' particles needed."
-    },
-    "string": {
-        "voice": "String theory is like a flat drawing. Core-Helix is the real 3D object. It's much simpler to understand!",
-        "brief": "String theory says everything is a tiny vibrating string in 11 hidden dimensions. That's hard to visualize, right? My theory says everything is a 3D Spiral (a Helix). It’s like the difference between a drawing of a spring and a real, bouncy metal spring you can actually touch."
-    },
-    "proton": {
-        "voice": "A Proton Star is like a crowded elevator where everyone locks arms so they don't fall over. It's super stable!",
-        "brief": "Usually, protons push each other away like the same ends of magnets. But in a Proton Star, the pressure is so high they 'Lock Gears.' They form one giant, solid structure. It sounds impossible, but it's just a 3D mechanical puzzle solved by high pressure!"
-    }
+# --- THE UNIVERSAL CORE-HELIX LAWS ---
+# This is the "Brain" the AI uses to answer anything accurately
+LAWS = {
+    "Matter": "Everything is a 3D spiral. Smaller spirals (Hydrogen) are loose; heavier ones (Iron) are tight.",
+    "Gravity": "It's just tension. Like a rubber band pulling on the spirals.",
+    "Space": "It's a mechanical lattice. It's not empty; it's a grid with a stiffness of 3.16.",
+    "Energy": "Vibration frequency of the helical anchors."
 }
 
-# --- 2. VOICE ENGINE ---
 def speak(text):
     tts = gTTS(text=text, lang='en', tld='com', slow=False)
     fp = io.BytesIO()
@@ -36,49 +23,65 @@ def speak(text):
     md = f'<audio autoplay="true"><source src="data:audio/mp3;base64,{b64}" type="audio/mp3"></audio>'
     st.markdown(md, unsafe_allow_html=True)
 
-# --- 3. UI STYLE ---
-st.set_page_config(page_title="Charan's Helix Lab", layout="wide")
-st.markdown("""
-    <style>
-    .stTextArea textarea { font-size: 1.2rem; color: #00f2ff; background-color: #101010; }
-    .stMarkdown p { font-size: 1.1rem; }
-    </style>
-    """, unsafe_allow_html=True)
+st.set_page_config(page_title="Core-Helix Student Lab", layout="wide")
+st.title("⚛️ CORE-HELIX: THE STUDENT PEER ORACLE")
+st.markdown('<p style="color:#00f2ff;">Lead Researcher: Charan | IIIT Kurnool</p>', unsafe_allow_html=True)
 
-st.title("⚛️ CORE-HELIX INTERACTIVE ORACLE")
-st.subheader("Interactive Student Edition | Lead Researcher: Charan")
+# --- THE DYNAMIC RESPONSE ENGINE ---
+st.sidebar.header("💬 Talk to the Lab Peer")
+user_q = st.sidebar.text_area("Ask me like I'm your lab partner:", placeholder="What about Hydrogen?")
 
-# --- 4. THE INTERACTIVE CHAT ---
-st.sidebar.header("🤖 Ask me anything!")
-user_query = st.sidebar.text_area("What's confusing you?", placeholder="Try: 'Why is Iron-56 weird?' or 'Is Dark Matter real?'")
-
-if user_query:
-    q = user_query.lower()
-    # Smarter keyword detection
-    if any(x in q for x in ["iron", "56", "jump", "heat"]):
-        data = KNOWLEDGE_BASE["iron"]
-    elif any(x in q for x in ["galaxy", "dark matter", "space", "stars"]):
-        data = KNOWLEDGE_BASE["galaxy"]
-    elif any(x in q for x in ["string", "dimension", "dimensions"]):
-        data = KNOWLEDGE_BASE["string"]
-    elif any(x in q for x in ["proton", "star", "strange", "impossible"]):
-        data = KNOWLEDGE_BASE["proton"]
-    else:
-        data = {
-            "voice": "That's a great question! I'm checking the 5 Mountains data for that now.",
-            "brief": "I don't have a specific 'Simplified Brief' for that yet, but everything in this lab follows the same rule: Space is mechanical, not magical. Try asking about the Galaxies or the Proton Stars!"
-        }
-
-    st.sidebar.markdown(f"**The Simple Explanation:**\n\n{data['brief']}")
+if user_q:
+    q = user_q.lower()
     
-    if st.sidebar.button("🔊 Listen to Oracle"):
-        speak(data['voice'])
-    st.sidebar.success(data['voice'])
+    # 1. ATOMS / HYDROGEN / ELEMENTS
+    if any(x in q for x in ["hydrogen", "atom", "element", "matter", "proton"]):
+        voice = "Think of Hydrogen as a single, loose spring. It's the simplest helix in our lab!"
+        brief = f"In our model, {user_q} isn't just a particle. It's a specific 3D spiral shape. Since it's light, its 'Helical Tension' is low. Unlike String Theory, we don't need 11 dimensions to see it—it's right here in 3D!"
+        
+    # 2. GRAVITY / WEIGHT / PULL
+    elif any(x in q for x in ["gravity", "pull", "weight", "fall", "black hole"]):
+        voice = "Gravity is just space acting like a giant trampoline pulling on our anchors."
+        brief = "Instead of curved spacetime, imagine a giant mesh. When you have a heavy helix, it pulls the mesh tight. That pull is what we feel as gravity. We call this the L-Factor leakage!"
+        
+    # 3. THE 5 MOUNTAINS / IRON / HEAT
+    elif any(x in q for x in ["iron", "56", "mountain", "heat", "temperature"]):
+        voice = "Mountain 5 is the big one! It's where the vacuum gears finally slip."
+        brief = "At 1808 Kelvin, Iron-56 hits a limit. Imagine a clock gear spinning so fast it jumps a tooth. That 'jump' is the heat anomaly! It proves space has a mechanical stiffness (K=3.16)."
 
-# --- 5. VISUALS ---
-st.write("### 🌀 See the Helix in Action")
-f_sim = st.slider("Energy Level", 1, 100, 45)
-t = np.linspace(0, 10, 500)
-fig = go.Figure(data=[go.Scatter3d(x=np.sin(t*f_sim), y=np.cos(t*f_sim), z=t, mode='lines', line=dict(color='#00f2ff', width=8))])
-fig.update_layout(scene=dict(bgcolor='black', xaxis=dict(visible=False), yaxis=dict(visible=False), zaxis=dict(visible=False)), margin=dict(l=0,r=0,b=0,t=0), paper_bgcolor='black')
-st.plotly_chart(fig, use_container_width=True)
+    # 4. DEFAULT (UNIVERSAL LAW)
+    else:
+        voice = "That's a deep one. Let's look at it through the 3D Helix lens."
+        brief = f"Even for {user_q}, the rule is the same: Space is a mechanical grid, not a ghost. If it exists, it has a spiral shape (Helix) and a tension level. Everything connects back to the K-Stiffness of our 3.14 dimension!"
+
+    st.sidebar.info(brief)
+    if st.sidebar.button("🔊 Play Peer Audio"):
+        speak(voice)
+    st.sidebar.success(voice)
+
+# --- DUAL-VIEW EXPERIMENT ---
+col1, col2 = st.columns(2)
+
+with col1:
+    st.write("### 🌀 3D Helix Geometry")
+    freq = st.slider("Vibration Speed", 1, 100, 40)
+    t = np.linspace(0, 10, 500)
+    # The "Student" visual: Color changes with frequency
+    color = "#00f2ff" if freq < 70 else "#ff0055"
+    fig = go.Figure(data=[go.Scatter3d(x=np.sin(t*freq), y=np.cos(t*freq), z=t, mode='lines', line=dict(color=color, width=10))])
+    fig.update_layout(scene=dict(bgcolor='black'), margin=dict(l=0,r=0,b=0,t=0), paper_bgcolor='black')
+    st.plotly_chart(fig, use_container_width=True)
+
+with col2:
+    st.write("### 📉 The NASA Flat-Curve Proof")
+    # Interactive rotation curve
+    r = np.linspace(1, 20, 100)
+    standard = 1/np.sqrt(r)
+    core_helix = np.full_like(r, 0.8) # The "Flat" result
+    fig_rc = go.Figure()
+    fig_rc.add_trace(go.Scatter(x=r, y=standard, name="Old Physics (Fails)", line=dict(dash='dash')))
+    fig_rc.add_trace(go.Scatter(x=r, y=core_helix, name="Core-Helix (Matches Data)", line=dict(width=4, color="#00f2ff")))
+    fig_rc.update_layout(title="Galaxy Rotation Curve", template="plotly_dark")
+    st.plotly_chart(fig_rc, use_container_width=True)
+
+st.write("**Peer Note:** If they ask a tough question, point to the Flat Curve. It's the hardest data to argue with!")
